@@ -1,0 +1,30 @@
+/* demo page */
+
+.demo-page {
+    margin: 0;
+    padding: 10px 20px;
+    font: 16px "Arial";
+}
+.demo-page h1 {
+    font: bold 22px/22px "Arial";
+}
+.demo-page h2 {
+    font: bold 18px/18px "Arial";
+}
+.demo-page .form-example {
+    border: 1px solid gray;
+    padding: 10px;
+    width: 200px;
+}
+.demo-page .form-example label {
+    display: block;
+    font-size: 15px;
+}
+.demo-page .form-example .field,
+.demo-page .form-example select {
+    margin-top: 3px;
+    margin-bottom: 8px;
+}
+.demo-page .form-example button {
+    padding: 4px 20px;
+}
