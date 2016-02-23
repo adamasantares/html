@@ -135,5 +135,7 @@ tg('select', ['option1', 'option2', 'option3']); // for <option>'s "value" attri
 tg('select', ['value1' => ['title1', 'disabled'], 'value2' => 'title2', 'value3' => ['title3', 'selected'] ]);
 ```
 
-The end
--------
+More examples
+-------------
+
+See index.php file for more examples.
