@@ -119,7 +119,7 @@ tg('form.signin', [
     tg('label', ['Password', 'br/',
         tg('input!password$password', '')
     ]),
-    tg(['input!password$password', 'readonly', 'title' => 'tooltip text'], 'Only for read'),
+    tg(['input!password$password:readonly', 'title' => 'tooltip text'], 'Only for read'),
     'br/',
     tg('button', 'Login')
 ]);
@@ -132,7 +132,7 @@ This example of how to create &lt;select&gt; tag.
 ```php
 tg('select', ['option1', 'option2', 'option3']); // for <option>'s "value" attribute will used key of array element
 
-tg('select', ['value1' => ['title1', 'disabled'], 'value2' => 'title2', 'value3' => ['title3', 'selected'] ]);
+tg('select', ['value1' => 'title1', 'value2' => ['title2', 'disabled'], 'value3' => ['title3', 'selected', 'data-something' => 'somevalue]]);
 ```
 
 More examples

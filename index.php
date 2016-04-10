@@ -40,9 +40,9 @@ echo tg(['html5', 'lang' => 'en'], [
                     tg('input!password$pwd.field', '')
                 ]),
                 tg('label', ['Sex', 'br/',
-                    tg('select.sex', [2 => ['Angel/Daemon', 'disabled'], 1 => 'Male', 0 => 'Female'])
+                    tg('select.sex', ['2' => ['Angel/Daemon', 'disabled'], '1' => ['Male', 'data-has_beer' => 'true'], '0' => 'Female'])
                 ]),
-                tg(['input!text.field', 'readonly', 'title' => 'tooltip text'], 'Only for read'),
+                tg(['input!text.field:readonly', 'title' => 'tooltip text'], 'Only for read'),
                 tg('button', 'Send')
             ])
         ),

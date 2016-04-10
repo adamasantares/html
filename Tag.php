@@ -91,8 +91,8 @@ class Tag {
             // parse attributes
             foreach ($properties as $property => $value) {
                 if ($property == '0' || (!is_string($value) && !is_numeric($value))) continue;
-                if (is_numeric($property)) {
-                    $this->attributes[$value] = $value;
+                if (gettype($property) == 'integer') {
+                    $this->attributes[$value] = '';
                 } else {
                     $this->attributes[$property] = $value;
                 }
@@ -105,7 +105,7 @@ class Tag {
         }
         // name, class, id,  etc.
         // Tokens: "#id", ".class", "$nameAttributeValue", "@relAttributeValue", "!typeAttributeValue", "%contentAttributeName"
-        $idString = str_replace(['#', '.', '$', '@', '!', '%', '  '], [' #', ' .', ' $', ' @', ' !', ' %', ' '], $idString);
+        $idString = str_replace(['#', '.', '$', '@', '!', '%', ':', '  '], [' #', ' .', ' $', ' @', ' !', ' %', ' :', ' '], $idString);
         $idString = explode(' ', trim($idString));
         $idString = array_filter($idString, function($v){
             return !empty($v);
@@ -114,19 +114,17 @@ class Tag {
             $char = substr($token, 0, 1);
             switch ($char) {
                 case '#':
-                    $this->id(substr($token, 1));
-                    break;
+                    $this->id(substr($token, 1)); break;
                 case '.':
-                    $this->addCls(substr($token, 1));
-                    break;
+                    $this->addCls(substr($token, 1)); break;
                 case '$':
-                    $this->attributes['name'] = substr($token, 1);
-                    break;
+                    $this->attributes['name'] = substr($token, 1); break;
                 case '@':
-                    $this->attributes['rel'] = substr($token, 1);
-                    break;
+                    $this->attributes['rel'] = substr($token, 1); break;
                 case '!':
-                    $this->attributes['type'] = substr($token, 1);
+                    $this->attributes['type'] = substr($token, 1); break;
+                case ':':
+                    $this->attributes[ substr($token, 1) ] = '';
                     break;
                 case '%':
                     if (is_string($content) || is_numeric($content)) {
@@ -333,24 +331,13 @@ class Tag {
         $tags = [];
         if (is_array($options)) {
             foreach ($options as $value => $properties) {
-                // properties may be string (title) or array of [title, selected]
                 if (!is_array($properties)) {
                     $properties = [$properties];
                 }
-                $id = ['option', 'value' => $value];
-                $selectedKey = array_search('selected', $properties);
-                $disabledKey = array_search('disabled', $properties);
-                if ($selectedKey !== false) {
-                    unset($properties[$selectedKey]);
-                    $properties = array_values($properties);
-                    $id['selected'] = 'selected';
-                }
-                if ($disabledKey !== false) {
-                    unset($properties[$disabledKey]);
-                    $properties = array_values($properties);
-                    $id['disabled'] = 'disabled';
-                }
-                $tags[] = new self($id, $properties[0]);
+                $title = empty($properties[0]) ? '---' : $properties[0];
+                unset($properties[0]);
+                $properties = array_merge(['option'], $properties, ['value' => $value]);
+                $tags[] = new self($properties, $title);
             }
         }
         return $tags;
@@ -374,7 +361,7 @@ class Tag {
     public function query($query)
     {
         // TODO query
-
+        // delegation to helper TagQuery's methods
 
     }
 
@@ -390,7 +377,11 @@ class Tag {
         $tag .= $offset . '<' . $this->tagName;
         // attributes
         foreach ($this->attributes as $attr => $value) {
-            $tag .= ' ' . $attr . '="' . htmlspecialchars($value) . '"';
+            if (trim($value) == '') {
+                $tag .= ' ' . $attr; // empty attribute
+            } else {
+                $tag .= ' ' . $attr . '="' . htmlspecialchars($value) . '"';
+            }
         }
         // classes
         if (!empty($this->classesNames)) {
