@@ -3,7 +3,7 @@
  * Html Tag Constructor
  *
  * @author Konstantin Kutsevalov
- * @email <mail@art-prog.ru>
+ * @email <konstantin@act-prog.ru>
  */
 
 namespace adamasantares\html;

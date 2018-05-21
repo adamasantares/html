@@ -5,7 +5,7 @@
  * Demo page
  *
  * @author Konstantin Kutsevalov
- * @email <mail@art-prog.ru>
+ * @email <konstantin@act-prog.ru>
  */
 
 require dirname(__FILE__) . '/Tag.php';
