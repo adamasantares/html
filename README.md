@@ -6,7 +6,7 @@ Just an experiment of HTML tags constructor
 How to use
 ----------
 
-The firs thing is it's prefer to use ["] char for $properties.
+The firs thing is it's prefer to use [ " ] char for $properties.
 
 ```php
 /**
@@ -21,7 +21,7 @@ tg("tagName .class .class .class #id ^nameAttr @rel !typeAttribute %contentAttri
 ```
 
 ```php
-tg("tagName .class ^nameAttr 'Simple text content {$variable}'"); // this is why it's better to use ["] instead [']
+tg("tagName .class ^nameAttr 'Simple text content {$variable}'"); // this is why it's better to use [ " ] instead [ ' ]
 ```
 
 ```php
