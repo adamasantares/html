@@ -146,3 +146,7 @@ More examples
 -------------
 
 See index.php file for more examples.
+
+```
+$ php -S localhost:3003
+```
