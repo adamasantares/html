@@ -6,20 +6,26 @@ Just an experiment of HTML tags constructor
 How to use
 ----------
 
+The firs thing is it's prefer to use ["] char for $properties.
+
 ```php
 /**
 * @param string|array Elements properties
 * @param string|Tag|Tag[] String line, Tag element or array of Tag elements
 */
-tg($properties, $content);
+tg($properties, $children);
 ```
 
 ```php
-tg('tagName .class .class .class #id $nameAttr @rel !typeAttribute %contentAttribute', 'content of tag or attribute');
+tg("tagName .class .class .class #id ^nameAttr @rel !typeAttribute %contentAttribute", 'content of tag or attribute');
 ```
 
 ```php
-tg(['tagName.class.class.class#id$nameAttr@rel!typeAttribute%contentAttribute', 'attr' => 'value'], 'content of tag or attribute');
+tg("tagName .class ^nameAttr 'Simple text content {$variable}'"); // this is why it's better to use ["] instead [']
+```
+
+```php
+tg(['tagName.class.class.class#id^nameAttr@rel!typeAttribute%contentAttribute', 'attr' => 'value'], 'content of tag or attribute');
 ```
 
 Simple examples
@@ -27,12 +33,13 @@ Simple examples
 
 ```php
 tg('p', 'Hello');  -->  <p>Hello</p>
+tg("p 'Hello'");  -->  <p>Hello</p>
 
-tg('.content', 'Hello');  -->  <div class="content">Hello</div>  // by default a tag's name is "DIV"
+tg(".content 'Hello'");  -->  <div class="content">Hello</div>  // by default a tag's name is "DIV"
 
-tg('meta$viewport', 'width=device-width, initial-scale=1');  -->  <meta name="viewport" content="width=device-width, initial-scale=1">
+tg("meta^viewport", 'width=device-width, initial-scale=1');  -->  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-tg('script@text/javascript%src', '/js/script.js');  -->  <script type="text/javascript" src="/js/script.js"></script>
+tg("script@text/javascript%src '/js/script.js'");  -->  <script type="text/javascript" src="/js/script.js"></script>
 ```
 
 Detailed examples
@@ -40,20 +47,20 @@ Detailed examples
 
 ###Example 1
 
-```tg("script #jquery !text/javascript %src", '/jquery.min.js');``` or ```tg("script#jquery!text/javascript%src", '/jquery.min.js');``` 
+```tg("script #jquery !text/javascript %src '/jquery.min.js'");``` or ```tg("script#jquery!text/javascript%src", '/jquery.min.js');``` 
 
 There are:
 
  - "script" - is a tag's name
  - "#jquery" - is value for "id" attribute
  - "!text/javascript" - is value for "type" attribute
- - "%src" - is name of attribute for $content
+ - "%src" - is name of attribute for content
      
 Result: ```<script id="jquery" type="text/javascript" src="/jquery.min.js"></script>``` 
     
 ###Example 2
 
-```tg('link @icon !image/x-icon', '/favicon.ico');```
+```tg("link @icon !image/x-icon '/favicon.ico'");```
 
 There are:
 
@@ -61,9 +68,9 @@ There are:
  - "@icon" - is value for "rel" attribute
  - "!image/x-icon" - is value for "type" attribute
  
-A single tag ("void element" or "empty element") hasn't body, so we can automatically set $content to one of attributes.
+A single tag ("void element" or "empty element") has no body, so TG can automatically set content to special content attribute.
 So, for LINK it is "href" attribute, for IMG it is "src", for META it is "content" attribute
-and for INPUT it is "value" attribute. That's mean you don't need to define "content attribute" by "%" token.
+and for INPUT it is "value" attribute. It means that you don't need to define "content attribute" by "%" token.
 In current example we didn't use "%href" in properties argument, but "href" will get "/favicon.ico" by auto. 
   
 Result: ```<link rel="icon" type="image/x-icon" href="/favicon.ico">```
@@ -82,7 +89,7 @@ Result: ```<a class="button" href="/url/path"><img class="my-img" src="/image.pn
 
 ###Example 4
  
-```tg('input!text$option', '123');```
+```tg("input!text^option '123'");```
 
 For Input tag no need to define name of attribute for value (as says in Example 2).
 
@@ -90,13 +97,13 @@ There are:
 
  - "input" - is a tag's name
  - "!text" - is value for "type" attribute
- - "$option" - is value for "name" attribute
+ - "^option" - is value for "name" attribute
 
 Result: ```<input type="text" name="option" value="123">```
 
 ###Example 5
 
-```tg('.super.puper.element#for_content', 'My content');```
+```tg(".super.puper.element#for_content 'My content'");```
 
 There are:
  
@@ -114,14 +121,14 @@ It will converted to <br> tag (for 'hr/' the same behaviour).
 ```php
 tg('form.signin', [
     tg('label', ['User name', 'br/',
-        tg('input!text$username', $username)
+        tg("input!text^username '{$username}'")
     ]),
     tg('label', ['Password', 'br/',
-        tg('input!password$password', '')
+        tg("input!password^password", '')
     ]),
-    tg(['input!password$password:readonly', 'title' => 'tooltip text'], 'Only for read'),
+    tg(['input!password^password:readonly', 'title' => 'tooltip text'], 'Only for read'),
     'br/',
-    tg('button', 'Login')
+    tg("button 'Login'")
 ]);
 ```
 

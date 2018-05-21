@@ -66,26 +66,26 @@ class Tag {
      *
      * ```<a class="button" href="/url/path"><img src="/image.png" alt="just-a-link" class="my-img"></a>```
      *
-     * Example 4: tg('input!text$option', '123'); // for Input tag no need to define name of attribute for value
+     * Example 4: tg("input!text^option '123'"); // last element of string argument wrapped by ' is value or content
      *
      * ```<input type="text" name="option" value="123">```
      *
-     * Example 5: tg('.super.puper.element', 'My content');  // by default a tag name is "DIV"
+     * Example 5: tg(".super.puper.element 'My content'");  // by default a tag name is "DIV"
      *
      * ```<div class="super puper element">My content</div>```
      *
-     * Tokens: "#id", ".class", "$nameAttributeValue", "@relAttributeValue", "!typeAttributeValue", "%contentAttributeName"
+     * Tokens: "#id", ".class", "^nameAttributeValue", "@relAttributeValue", "!typeAttributeValue", "%contentAttributeName"
      * </p>
-     * @param mixed $content <p>
+     * @param mixed $children <p>
      *  For single tags (like input, meta, img, etc..) this may be value for special
      *    attribute that defined in $properties argument via "%" char
      *    tg('script@text/javascript%src', '/js/script.js');
      *    in this example the "%src" is the name of attribute that will get $content value
      * </p>
      */
-    public function __construct($properties, $content = null)
+    public function __construct($properties, $children = null)
     {
-        // 'tagName.class.class.class#id$nameAttr@rel!type%contentAttribute'
+        // 'tagName .class.class.class #id ^nameAttr @rel !type %contentAttribute'
         $idString = '';
         if (is_array($properties)) {
             // parse attributes
@@ -103,9 +103,26 @@ class Tag {
         } else {
             $idString = $properties;
         }
+        // let's check last part for content/text
+        if (preg_match_all('/\'(.*)\'/', $idString, $matches)) {
+            $content = $matches[1][0];
+            $idString = str_replace("'{$content}'", '', $idString);
+            if (!empty($children)) {
+                if (is_array($children)) {
+                    $children = array_merge([$content], $children);
+                } else if (is_string($children)) {
+                    $children = [
+                        $content,
+                        $children
+                    ];
+                }
+            } else {
+                $children = $content;
+            }
+        }
         // name, class, id,  etc.
-        // Tokens: "#id", ".class", "$nameAttributeValue", "@relAttributeValue", "!typeAttributeValue", "%contentAttributeName"
-        $idString = str_replace(['#', '.', '$', '@', '!', '%', ':', '  '], [' #', ' .', ' $', ' @', ' !', ' %', ' :', ' '], $idString);
+        // Tokens: "#id", ".class", "^nameAttributeValue", "@relAttributeValue", "!typeAttributeValue", "%contentAttributeName"
+        $idString = str_replace(['#', '.', '^', '@', '!', '%', ':', '  '], [' #', ' .', ' ^', ' @', ' !', ' %', ' :', ' '], $idString);
         $idString = explode(' ', trim($idString));
         $idString = array_filter($idString, function($v){
             return !empty($v);
@@ -117,7 +134,7 @@ class Tag {
                     $this->id(substr($token, 1)); break;
                 case '.':
                     $this->addCls(substr($token, 1)); break;
-                case '$':
+                case '^':
                     $this->attributes['name'] = substr($token, 1); break;
                 case '@':
                     $this->attributes['rel'] = substr($token, 1); break;
@@ -127,9 +144,9 @@ class Tag {
                     $this->attributes[ substr($token, 1) ] = '';
                     break;
                 case '%':
-                    if (is_string($content) || is_numeric($content)) {
-                        $this->attributes[substr($token, 1)] = htmlspecialchars($content);
-                        $content = ''; // reset content
+                    if (is_string($children) || is_numeric($children)) {
+                        $this->attributes[substr($token, 1)] = htmlspecialchars($children);
+                        $children = ''; // reset content
                     }
                     break;
                 default:
@@ -139,10 +156,10 @@ class Tag {
         // contents
         if (!in_array($this->tagName, self::$single)) {
             // tag pair
-            if ($this->tagName == 'select' && is_array($content)) {
-                $this->contents = $this->generateSelectOptions($content);
-            } else if (($this->tagName == 'ul' || $this->tagName == 'ol') && is_array($content)) {
-                foreach ($content as $item) {
+            if ($this->tagName == 'select' && is_array($children)) {
+                $this->contents = $this->generateSelectOptions($children);
+            } else if (($this->tagName == 'ul' || $this->tagName == 'ol') && is_array($children)) {
+                foreach ($children as $item) {
                     if (is_string($item) || is_numeric($item)) {
                         $this->contents[] = tg('li', $item);
                     } else {
@@ -150,11 +167,11 @@ class Tag {
                     }
                 }
             } else {
-                if (!empty($content)) {
-                    if (!is_array($content)) {
-                        $content = [$content];
+                if (!empty($children)) {
+                    if (!is_array($children)) {
+                        $children = [$children];
                     }
-                    $this->contents = $content;
+                    $this->contents = $children;
                 }
                 if ($this->tagName == 'a' && !isset($this->attributes['title'])) {  // fix "title" of LINK
                     $this->attributes['title'] = '';
@@ -164,16 +181,16 @@ class Tag {
             }
         } else {
             // single tag
-            if (is_string($content) || is_numeric($content)) {
+            if (is_string($children) || is_numeric($children)) {
                 if ($this->tagName == 'input') {
-                    $this->attributes['value'] = $content;
+                    $this->attributes['value'] = $children;
                 } else if ($this->tagName == 'img') {
-                    $this->attributes['src'] = $content;
+                    $this->attributes['src'] = $children;
                     if (!isset($this->attributes['alt'])) {  $this->attributes['alt'] = '';  } // fix "alt" of "img"
                 } else if ($this->tagName == 'meta') {
-                    $this->attributes['content'] = $content;
+                    $this->attributes['content'] = $children;
                 } else if ($this->tagName == 'link') {
-                    $this->attributes['href'] = $content;
+                    $this->attributes['href'] = $children;
                 }
             }
         }
@@ -419,10 +436,10 @@ class Tag {
 /**
  * Alias for create tag object
  * @param string|array $properties
- * @param mixed $content It can be a String, Tag or Tag[]
+ * @param mixed $children It can be a String, Tag or Tag[]
  * @return Tag
  */
-function tg($properties, $content = null)
+function tg($properties, $children = null)
 {
-    return new Tag($properties, $content);
+    return new Tag($properties, $children);
 }
