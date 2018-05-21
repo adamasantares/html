@@ -66,7 +66,7 @@ echo tg(['html5', 'lang' => 'en'], [
         ]),
 
         tg("h2 'Result'"),
-        tg("p 'Source code of this page contain 2475 chars and result html page contain 2540 chars.'"),
+        tg("p 'Source code of this page contain 2490 chars and result html page contain 2580 chars.'"),
 
         tg("script%src '/script.js'"),
     ])
