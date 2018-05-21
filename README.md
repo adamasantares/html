@@ -145,7 +145,7 @@ tg('select', ['value1' => 'title1', 'value2' => ['title2', 'disabled'], 'value3'
 More examples
 -------------
 
-See index.php file for more examples.
+See [index.php](index.php) file for more examples.
 
 ```
 $ php -S localhost:3003
